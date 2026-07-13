@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "TestCpu.h"
+#include <tests/TestCpu.h>
 
 
 
@@ -9,14 +9,14 @@
 #pragma region Immediate
 
 TEST_F(CPUTest, LDAImmediateBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 
-	memory.set_byte(0xFFFC, CPU::LDAIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -31,14 +31,14 @@ TEST_F(CPUTest, LDAImmediateBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, LDAImmediateCorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x00;
 
-	memory.set_byte(0xFFFC, CPU::LDAIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -53,14 +53,14 @@ TEST_F(CPUTest, LDAImmediateCorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, LDAImmediateCorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x83;
 
-	memory.set_byte(0xFFFC, CPU::LDAIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -79,17 +79,17 @@ TEST_F(CPUTest, LDAImmediateCorrectlySetsNegativeFlag) {
 #pragma region ZeroPage
 
 TEST_F(CPUTest, LDAZeroPageBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x07;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDAZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -104,17 +104,17 @@ TEST_F(CPUTest, LDAZeroPageBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, LDAZeroPageCorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x00;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDAZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -129,17 +129,17 @@ TEST_F(CPUTest, LDAZeroPageCorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, LDAZeroPageCorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x87;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDAZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -164,14 +164,14 @@ TEST_F(CPUTest, LDAZeroPageXBehavesCorrectly) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAZPX);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAZPX);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -193,14 +193,14 @@ TEST_F(CPUTest, LDAZeroPageXCorrectlySetsZeroFlag) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAZPX);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAZPX);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -222,14 +222,14 @@ TEST_F(CPUTest, LDAZeroPageXCorrectlySetsNegativeFlag) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAZPX);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAZPX);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -251,14 +251,14 @@ TEST_F(CPUTest, LDAZeroPageXCorrectlyOverFlows) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAZPX);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAZPX);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -279,13 +279,13 @@ TEST_F(CPUTest, LDAAbsoluteBehavesCorrectly) {
 	BYTE value = 0x07;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -304,13 +304,13 @@ TEST_F(CPUTest, LDAAbsoluteCorrectlySetsZeroFlag) {
 	BYTE value = 0x00;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -329,13 +329,13 @@ TEST_F(CPUTest, LDAAbsoluteCorrectlySetsNegativeFlag) {
 	BYTE value = 0x87;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -359,13 +359,13 @@ TEST_F(CPUTest, LDAAbsoluteXBehavesCorrectly) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABSX);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABSX);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -387,13 +387,13 @@ TEST_F(CPUTest, LDAAbsoluteXCorrectlySetsZeroFlag) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABSX);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABSX);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -415,13 +415,13 @@ TEST_F(CPUTest, LDAAbsoluteXCorrectlySetsNegativeFlag) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABSX);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABSX);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -443,13 +443,13 @@ TEST_F(CPUTest, LDAAbsoluteXCorrectlyUsesExtraCycleAtPageBoundaryCrossing) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABSX);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABSX);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -473,13 +473,13 @@ TEST_F(CPUTest, LDAAbsoluteYBehavesCorrectly) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABSY);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABSY);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -501,13 +501,13 @@ TEST_F(CPUTest, LDAAbsoluteYCorrectlySetsZeroFlag) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABSY);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABSY);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -529,13 +529,13 @@ TEST_F(CPUTest, LDAAbsoluteYCorrectlySetsNegativeFlag) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABSY);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABSY);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -557,13 +557,13 @@ TEST_F(CPUTest, LDAAbsoluteYCorrectlyUsesExtraCycleAtPageBoundaryCrossing) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAABSY);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAABSY);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -588,14 +588,14 @@ TEST_F(CPUTest, LDAIndirectXBehavesCorrectly) {
 
 	cpu.X = addedZeroPageAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAINDX);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress + addedZeroPageAddress, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAINDX);
+	mainbus.set_byte(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress + addedZeroPageAddress, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -618,14 +618,14 @@ TEST_F(CPUTest, LDAIndirectXCorrectlySetsZeroFlag) {
 
 	cpu.X = addedZeroPageAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAINDX);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress + addedZeroPageAddress, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAINDX);
+	mainbus.set_word(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress + addedZeroPageAddress, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -648,14 +648,14 @@ TEST_F(CPUTest, LDAIndirectXCorrectlySetsNegativeFlag) {
 
 	cpu.X = addedZeroPageAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAINDX);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress + addedZeroPageAddress, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAINDX);
+	mainbus.set_word(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress + addedZeroPageAddress, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -680,14 +680,14 @@ TEST_F(CPUTest, LDAIndirectYBehavesCorrectly) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAINDY);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAINDY);
+	mainbus.set_word(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -710,14 +710,14 @@ TEST_F(CPUTest, LDAIndirectYCorrectlySetsZeroFlag) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAINDY);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAINDY);
+	mainbus.set_word(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -740,14 +740,14 @@ TEST_F(CPUTest, LDAIndirectYCorrectlySetsNegativeFlag) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAINDY);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAINDY);
+	mainbus.set_word(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -770,14 +770,14 @@ TEST_F(CPUTest, LDAIndirectYCorrectlyUsesExtraCycleAtPageBoundaryCrossing) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDAINDY);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDAINDY);
+	mainbus.set_word(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -796,14 +796,14 @@ TEST_F(CPUTest, LDAIndirectYCorrectlyUsesExtraCycleAtPageBoundaryCrossing) {
 #pragma region LDX
 #pragma region Immediate
 TEST_F(CPUTest, LDXImmediateBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 
-	memory.set_byte(0xFFFC, CPU::LDXIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -818,14 +818,14 @@ TEST_F(CPUTest, LDXImmediateBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, LDXImmediateCorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x00;
 
-	memory.set_byte(0xFFFC, CPU::LDXIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -840,14 +840,14 @@ TEST_F(CPUTest, LDXImmediateCorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, LDXImmediateCorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x87;
 
-	memory.set_byte(0xFFFC, CPU::LDXIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -864,17 +864,17 @@ TEST_F(CPUTest, LDXImmediateCorrectlySetsNegativeFlag) {
 
 #pragma region ZeroPage
 TEST_F(CPUTest, LDXZeroPageBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x07;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDXZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -889,17 +889,17 @@ TEST_F(CPUTest, LDXZeroPageBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, LDXZeroPageCorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x00;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDXZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -914,17 +914,17 @@ TEST_F(CPUTest, LDXZeroPageCorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, LDXZeroPageCorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x87;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDXZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -949,14 +949,14 @@ TEST_F(CPUTest, LDXZeroPageYBehavesCorrectly) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXZPY);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXZPY);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -978,14 +978,14 @@ TEST_F(CPUTest, LDXZeroPageYCorrectlySetsZeroFlag) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXZPY);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXZPY);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1007,14 +1007,14 @@ TEST_F(CPUTest, LDXZeroPageYCorrectlySetsNegativeFlag) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXZPY);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXZPY);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1036,14 +1036,14 @@ TEST_F(CPUTest, LDXZeroPageYCorrectlyOverFlows) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXZPY);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXZPY);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1064,13 +1064,13 @@ TEST_F(CPUTest, LDXAbsoluteBehavesCorrectly) {
 	BYTE value = 0x07;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1089,13 +1089,13 @@ TEST_F(CPUTest, LDXAbsoluteCorrectlySetsZeroFlag) {
 	BYTE value = 0x00;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1114,13 +1114,13 @@ TEST_F(CPUTest, LDXAbsoluteCorrectlySetsNegativeFlag) {
 	BYTE value = 0x87;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1144,13 +1144,13 @@ TEST_F(CPUTest, LDXAbsoluteYBehavesCorrectly) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXABSY);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXABSY);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1172,13 +1172,13 @@ TEST_F(CPUTest, LDXAbsoluteYCorrectlySetsZeroFlag) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXABSY);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXABSY);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1200,13 +1200,13 @@ TEST_F(CPUTest, LDXAbsoluteYCorrectlySetsNegativeFlag) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXABSY);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXABSY);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1228,13 +1228,13 @@ TEST_F(CPUTest, LDXAbsoluteYCorrectlyUsesExtraCycleAtPageBoundaryCrossing) {
 
 	cpu.Y = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDXABSY);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDXABSY);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1253,14 +1253,14 @@ TEST_F(CPUTest, LDXAbsoluteYCorrectlyUsesExtraCycleAtPageBoundaryCrossing) {
 #pragma region LDY
 #pragma region Immediate
 TEST_F(CPUTest, LDYImmediateBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 
-	memory.set_byte(0xFFFC, CPU::LDYIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1275,14 +1275,14 @@ TEST_F(CPUTest, LDYImmediateBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, LDYImmediateCorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x00;
 
-	memory.set_byte(0xFFFC, CPU::LDYIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1297,14 +1297,14 @@ TEST_F(CPUTest, LDYImmediateCorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, LDYImmediateCorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x87;
 
-	memory.set_byte(0xFFFC, CPU::LDYIM);
-	memory.set_byte(0xFFFD, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYIM);
+	mainbus.set_byte(0xFFFD, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1321,17 +1321,17 @@ TEST_F(CPUTest, LDYImmediateCorrectlySetsNegativeFlag) {
 
 #pragma region ZeroPage
 TEST_F(CPUTest, LDYZeroPageBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x07;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDYZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1346,17 +1346,17 @@ TEST_F(CPUTest, LDYZeroPageBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, LDYZeroPageCorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x00;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDYZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1371,17 +1371,17 @@ TEST_F(CPUTest, LDYZeroPageCorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, LDYZeroPageCorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE address = 0x45;
 	BYTE value = 0x87;
 	uint32_t cyclesNeeded = 3;
 
-	memory.set_byte(0xFFFC, CPU::LDYZP);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYZP);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1405,14 +1405,14 @@ TEST_F(CPUTest, LDYZeroPageXBehavesCorrectly) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYZPX);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYZPX);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1434,14 +1434,14 @@ TEST_F(CPUTest, LDYZeroPageXCorrectlySetsZeroFlag) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYZPX);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYZPX);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1463,13 +1463,13 @@ TEST_F(CPUTest, LDYZeroPageXCorrectlySetsNegativeFlag) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYZPX);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYZPX);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1491,13 +1491,13 @@ TEST_F(CPUTest, LDYZeroPageXCorrectlyOverFlows) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYZPX);
-	memory.set_byte(0xFFFD, address);
-	memory.set_byte((BYTE)(address + addedAddress), value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYZPX);
+	mainbus.set_byte(0xFFFD, address);
+	mainbus.set_byte((BYTE)(address + addedAddress), value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1518,13 +1518,13 @@ TEST_F(CPUTest, LDYAbsoluteBehavesCorrectly) {
 	BYTE value = 0x07;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1543,13 +1543,13 @@ TEST_F(CPUTest, LDYAbsoluteCorrectlySetsZeroFlag) {
 	BYTE value = 0x00;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1568,13 +1568,13 @@ TEST_F(CPUTest, LDYAbsoluteCorrectlySetsNegativeFlag) {
 	BYTE value = 0x87;
 	uint32_t cyclesNeeded = 4;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYABS);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYABS);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1598,13 +1598,13 @@ TEST_F(CPUTest, LDYAbsoluteXBehavesCorrectly) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYABSX);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYABSX);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1626,13 +1626,13 @@ TEST_F(CPUTest, LDYAbsoluteXCorrectlySetsZeroFlag) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYABSX);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYABSX);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1654,13 +1654,13 @@ TEST_F(CPUTest, LDYAbsoluteXCorrectlySetsNegativeFlag) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYABSX);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYABSX);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1682,13 +1682,13 @@ TEST_F(CPUTest, LDYAbsoluteXCorrectlyUsesExtraCycleAtPageBoundaryCrossing) {
 
 	cpu.X = addedAddress;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::LDYABSX);
-	memory.set_word(0xFFFD, address);
-	memory.set_byte(address + addedAddress, value);
+	mainbus.set_byte(0xFFFC, NESsie::LDYABSX);
+	mainbus.set_word(0xFFFD, address);
+	mainbus.set_byte(address + addedAddress, value);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -1710,7 +1710,7 @@ TEST_F(CPUTest, LDYAbsoluteXCorrectlyUsesExtraCycleAtPageBoundaryCrossing) {
 
 #pragma region ZeroPage
 TEST_F(CPUTest, STAZeroPageBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x07;
@@ -1719,12 +1719,12 @@ TEST_F(CPUTest, STAZeroPageBehavesCorrectly) {
 
 	cpu.A = value;
 
-	memory.set_byte(0xFFFC, CPU::STAZP);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STAZP);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address), value);
+	EXPECT_EQ(mainbus.read_byte(address), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1739,7 +1739,7 @@ TEST_F(CPUTest, STAZeroPageBehavesCorrectly) {
 
 #pragma region ZeroPageX
 TEST_F(CPUTest, STAZeroPageXBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x07;
@@ -1750,12 +1750,12 @@ TEST_F(CPUTest, STAZeroPageXBehavesCorrectly) {
 	cpu.A = value;
 	cpu.X = addedAddress;
 
-	memory.set_byte(0xFFFC, CPU::STAZPX);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STAZPX);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address + addedAddress), value);
+	EXPECT_EQ(mainbus.read_byte(address + addedAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1768,7 +1768,7 @@ TEST_F(CPUTest, STAZeroPageXBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, STAZeroPageXCorrectlyOverflows) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x17;
@@ -1779,14 +1779,14 @@ TEST_F(CPUTest, STAZeroPageXCorrectlyOverflows) {
 	cpu.A = value;
 	cpu.X = addedAddress;
 
-	memory.set_byte(0xFFFC, CPU::STAZPX);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STAZPX);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	BYTE resultingAddress = address + addedAddress;
 
-	EXPECT_EQ(memory.read_byte(resultingAddress), value);
+	EXPECT_EQ(mainbus.read_byte(resultingAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1801,7 +1801,7 @@ TEST_F(CPUTest, STAZeroPageXCorrectlyOverflows) {
 
 #pragma region Absolute
 TEST_F(CPUTest, STAAbsoluteBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	WORD address = 0x0345;
@@ -1810,12 +1810,12 @@ TEST_F(CPUTest, STAAbsoluteBehavesCorrectly) {
 
 	cpu.A = value;
 
-	memory.set_byte(0xFFFC, CPU::STAABS);
-	memory.set_word(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STAABS);
+	mainbus.set_word(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address), value);
+	EXPECT_EQ(mainbus.read_byte(address), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1830,7 +1830,7 @@ TEST_F(CPUTest, STAAbsoluteBehavesCorrectly) {
 
 #pragma region AbsoluteX
 TEST_F(CPUTest, STAAbsoluteXBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	WORD address = 0x0345;
@@ -1841,12 +1841,12 @@ TEST_F(CPUTest, STAAbsoluteXBehavesCorrectly) {
 	cpu.A = value;
 	cpu.X = addedAddress;
 
-	memory.set_byte(0xFFFC, CPU::STAABSX);
-	memory.set_word(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STAABSX);
+	mainbus.set_word(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address + addedAddress), value);
+	EXPECT_EQ(mainbus.read_byte(address + addedAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1861,7 +1861,7 @@ TEST_F(CPUTest, STAAbsoluteXBehavesCorrectly) {
 
 #pragma region AbsoluteY
 TEST_F(CPUTest, STAAbsoluteYBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	WORD address = 0x0345;
@@ -1872,12 +1872,12 @@ TEST_F(CPUTest, STAAbsoluteYBehavesCorrectly) {
 	cpu.A = value;
 	cpu.Y = addedAddress;
 
-	memory.set_byte(0xFFFC, CPU::STAABSY);
-	memory.set_word(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STAABSY);
+	mainbus.set_word(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address + addedAddress), value);
+	EXPECT_EQ(mainbus.read_byte(address + addedAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1901,15 +1901,15 @@ TEST_F(CPUTest, STAIndirectXBehavesCorrectly) {
 	cpu.X = addedZeroPageAddress;
 	cpu.A = value;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::STAINDX);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress + addedZeroPageAddress, address);
+	mainbus.set_byte(0xFFFC, NESsie::STAINDX);
+	mainbus.set_word(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress + addedZeroPageAddress, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address), value);
+	EXPECT_EQ(mainbus.read_byte(address), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1933,15 +1933,15 @@ TEST_F(CPUTest, STAIndirectYBehavesCorrectly) {
 	cpu.Y = addedAddress;
 	cpu.A = value;
 
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
-	memory.set_byte(0xFFFC, CPU::STAINDY);
-	memory.set_word(0xFFFD, zeroPageAddress);
-	memory.set_word(zeroPageAddress, address);
+	mainbus.set_byte(0xFFFC, NESsie::STAINDY);
+	mainbus.set_word(0xFFFD, zeroPageAddress);
+	mainbus.set_word(zeroPageAddress, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address + addedAddress), value);
+	EXPECT_EQ(mainbus.read_byte(address + addedAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1960,7 +1960,7 @@ TEST_F(CPUTest, STAIndirectYBehavesCorrectly) {
 
 #pragma region ZeroPage
 TEST_F(CPUTest, STXZeroPageBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x07;
@@ -1969,12 +1969,12 @@ TEST_F(CPUTest, STXZeroPageBehavesCorrectly) {
 
 	cpu.X = value;
 
-	memory.set_byte(0xFFFC, CPU::STXZP);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STXZP);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address), value);
+	EXPECT_EQ(mainbus.read_byte(address), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -1989,7 +1989,7 @@ TEST_F(CPUTest, STXZeroPageBehavesCorrectly) {
 
 #pragma region ZeroPageY
 TEST_F(CPUTest, STXZeroPageYBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x07;
@@ -2000,12 +2000,12 @@ TEST_F(CPUTest, STXZeroPageYBehavesCorrectly) {
 	cpu.X = value;
 	cpu.Y = addedAddress;
 
-	memory.set_byte(0xFFFC, CPU::STXZPY);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STXZPY);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address + addedAddress), value);
+	EXPECT_EQ(mainbus.read_byte(address + addedAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -2018,7 +2018,7 @@ TEST_F(CPUTest, STXZeroPageYBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, STXZeroPageYCorrectlyOverflows) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x17;
@@ -2029,14 +2029,14 @@ TEST_F(CPUTest, STXZeroPageYCorrectlyOverflows) {
 	cpu.X = value;
 	cpu.Y = addedAddress;
 
-	memory.set_byte(0xFFFC, CPU::STXZPY);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STXZPY);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	BYTE resultingAddress = address + addedAddress;
 
-	EXPECT_EQ(memory.read_byte(resultingAddress), value);
+	EXPECT_EQ(mainbus.read_byte(resultingAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -2051,7 +2051,7 @@ TEST_F(CPUTest, STXZeroPageYCorrectlyOverflows) {
 
 #pragma region Absolute
 TEST_F(CPUTest, STXAbsoluteBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	WORD address = 0x0345;
@@ -2060,12 +2060,12 @@ TEST_F(CPUTest, STXAbsoluteBehavesCorrectly) {
 
 	cpu.X = value;
 
-	memory.set_byte(0xFFFC, CPU::STXABS);
-	memory.set_word(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STXABS);
+	mainbus.set_word(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address), value);
+	EXPECT_EQ(mainbus.read_byte(address), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -2084,7 +2084,7 @@ TEST_F(CPUTest, STXAbsoluteBehavesCorrectly) {
 
 #pragma region ZeroPage
 TEST_F(CPUTest, STYZeroPageBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x07;
@@ -2093,12 +2093,12 @@ TEST_F(CPUTest, STYZeroPageBehavesCorrectly) {
 
 	cpu.Y = value;
 
-	memory.set_byte(0xFFFC, CPU::STYZP);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STYZP);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address), value);
+	EXPECT_EQ(mainbus.read_byte(address), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -2113,7 +2113,7 @@ TEST_F(CPUTest, STYZeroPageBehavesCorrectly) {
 
 #pragma region ZeroPageX
 TEST_F(CPUTest, STYZeroPageXBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x07;
@@ -2124,12 +2124,12 @@ TEST_F(CPUTest, STYZeroPageXBehavesCorrectly) {
 	cpu.Y = value;
 	cpu.X = addedAddress;
 
-	memory.set_byte(0xFFFC, CPU::STYZPX);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STYZPX);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address + addedAddress), value);
+	EXPECT_EQ(mainbus.read_byte(address + addedAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -2142,7 +2142,7 @@ TEST_F(CPUTest, STYZeroPageXBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, STYZeroPageXCorrectlyOverflows) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	BYTE address = 0x17;
@@ -2153,14 +2153,14 @@ TEST_F(CPUTest, STYZeroPageXCorrectlyOverflows) {
 	cpu.Y = value;
 	cpu.X = addedAddress;
 
-	memory.set_byte(0xFFFC, CPU::STYZPX);
-	memory.set_byte(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STYZPX);
+	mainbus.set_byte(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
 	BYTE resultingAddress = address + addedAddress;
 
-	EXPECT_EQ(memory.read_byte(resultingAddress), value);
+	EXPECT_EQ(mainbus.read_byte(resultingAddress), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -2175,7 +2175,7 @@ TEST_F(CPUTest, STYZeroPageXCorrectlyOverflows) {
 
 #pragma region Absolute
 TEST_F(CPUTest, STYAbsoluteBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 	WORD address = 0x0345;
@@ -2184,12 +2184,12 @@ TEST_F(CPUTest, STYAbsoluteBehavesCorrectly) {
 
 	cpu.Y = value;
 
-	memory.set_byte(0xFFFC, CPU::STYABS);
-	memory.set_word(0xFFFD, address);
+	mainbus.set_byte(0xFFFC, NESsie::STYABS);
+	mainbus.set_word(0xFFFD, address);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(cyclesNeeded, mainbus);
 
-	EXPECT_EQ(memory.read_byte(address), value);
+	EXPECT_EQ(mainbus.read_byte(address), value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
 	EXPECT_EQ(cpu.PS.Z, cpuCopy.PS.Z);
 	EXPECT_EQ(cpu.PS.I, cpuCopy.PS.I);
@@ -2208,15 +2208,15 @@ TEST_F(CPUTest, STYAbsoluteBehavesCorrectly) {
 #pragma region Transfer
 #pragma region TAX
 TEST_F(CPUTest, TAXBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 
 	cpu.A = value;
 
-	memory.set_byte(0xFFFC, CPU::TAX);
+	mainbus.set_byte(0xFFFC, NESsie::TAX);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2231,15 +2231,15 @@ TEST_F(CPUTest, TAXBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, TAXCorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x00;
 
 	cpu.A = value;
 
-	memory.set_byte(0xFFFC, CPU::TAX);
+	mainbus.set_byte(0xFFFC, NESsie::TAX);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2254,15 +2254,15 @@ TEST_F(CPUTest, TAXCorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, TAXCorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x81;
 
 	cpu.A = value;
 
-	memory.set_byte(0xFFFC, CPU::TAX);
+	mainbus.set_byte(0xFFFC, NESsie::TAX);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.X, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2279,15 +2279,15 @@ TEST_F(CPUTest, TAXCorrectlySetsNegativeFlag) {
 
 #pragma region TXA
 TEST_F(CPUTest, TXABehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 
 	cpu.X = value;
 
-	memory.set_byte(0xFFFC, CPU::TXA);
+	mainbus.set_byte(0xFFFC, NESsie::TXA);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2302,15 +2302,15 @@ TEST_F(CPUTest, TXABehavesCorrectly) {
 }
 
 TEST_F(CPUTest, TXACorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x00;
 
 	cpu.X = value;
 
-	memory.set_byte(0xFFFC, CPU::TXA);
+	mainbus.set_byte(0xFFFC, NESsie::TXA);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2325,15 +2325,15 @@ TEST_F(CPUTest, TXACorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, TXACorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x81;
 
 	cpu.X = value;
 
-	memory.set_byte(0xFFFC, CPU::TXA);
+	mainbus.set_byte(0xFFFC, NESsie::TXA);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2350,15 +2350,15 @@ TEST_F(CPUTest, TXACorrectlySetsNegativeFlag) {
 
 #pragma region TAY
 TEST_F(CPUTest, TAYBehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 
 	cpu.A = value;
 
-	memory.set_byte(0xFFFC, CPU::TAY);
+	mainbus.set_byte(0xFFFC, NESsie::TAY);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2373,15 +2373,15 @@ TEST_F(CPUTest, TAYBehavesCorrectly) {
 }
 
 TEST_F(CPUTest, TAYCorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x00;
 
 	cpu.A = value;
 
-	memory.set_byte(0xFFFC, CPU::TAY);
+	mainbus.set_byte(0xFFFC, NESsie::TAY);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2396,15 +2396,15 @@ TEST_F(CPUTest, TAYCorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, TAYCorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x81;
 
 	cpu.A = value;
 
-	memory.set_byte(0xFFFC, CPU::TAY);
+	mainbus.set_byte(0xFFFC, NESsie::TAY);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.Y, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2421,15 +2421,15 @@ TEST_F(CPUTest, TAYCorrectlySetsNegativeFlag) {
 
 #pragma region TYA
 TEST_F(CPUTest, TYABehavesCorrectly) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x11;
 
 	cpu.Y = value;
 
-	memory.set_byte(0xFFFC, CPU::TYA);
+	mainbus.set_byte(0xFFFC, NESsie::TYA);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2444,15 +2444,15 @@ TEST_F(CPUTest, TYABehavesCorrectly) {
 }
 
 TEST_F(CPUTest, TYACorrectlySetsZeroFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x00;
 
 	cpu.Y = value;
 
-	memory.set_byte(0xFFFC, CPU::TYA);
+	mainbus.set_byte(0xFFFC, NESsie::TYA);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);
@@ -2467,15 +2467,15 @@ TEST_F(CPUTest, TYACorrectlySetsZeroFlag) {
 }
 
 TEST_F(CPUTest, TYACorrectlySetsNegativeFlag) {
-	CPU::CPU cpuCopy = cpu;
+	NESsie::CPU cpuCopy = cpu;
 
 	BYTE value = 0x81;
 
 	cpu.Y = value;
 
-	memory.set_byte(0xFFFC, CPU::TYA);
+	mainbus.set_byte(0xFFFC, NESsie::TYA);
 
-	uint32_t cyclesExecuted = cpu.executeCycles(2, memory);
+	uint32_t cyclesExecuted = cpu.executeCycles(2, mainbus);
 
 	EXPECT_EQ(cpu.A, value);
 	EXPECT_EQ(cpu.PS.C, cpuCopy.PS.C);

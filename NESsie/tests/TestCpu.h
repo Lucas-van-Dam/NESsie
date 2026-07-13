@@ -4,13 +4,13 @@
 class CPUTest : public testing::Test {
 protected:
 	CPUTest() {
-		cpu.initialize(memory);
+		cpu.initialize(mainbus);
 	}
 
 	~CPUTest() {
 
 	}
 
-	CPU::CPU cpu;
-	Memory::Memory memory;
+	NESsie::CPU cpu;
+	NESsie::MainBus mainbus;
 };

@@ -2,10 +2,39 @@
 # project specific logic here.
 #
 # Add source to this project's executable.
-add_executable (NESsie "NESsie.cpp" "NESsie.h" "cpu.h" "memory.h" "defines.h" "memory.cpp" "cpu.cpp")
+add_executable (NESsie "NESsie.cpp" "NESsie.h" "cpu.h" "mainbus.h" "defines.h" "mainbus.cpp" "cpu.cpp" "cartridge.h" "cartridge.cpp" "mapper.h" "mapper.cpp" "NROMMapper.cpp"
+        TestMapper.cpp
+        TestMapper.h
+        ppu.cpp
+        ppu.h
+        VirtualScreen.cpp
+        VirtualScreen.h)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET NESsie PROPERTY CXX_STANDARD 20)
+endif()
+
+target_link_libraries(NESsie PRIVATE SDL3::SDL3)
+
+if(MSVC)
+  execute_process(
+          COMMAND ping www.google.com -n 2
+          ERROR_QUIET
+          RESULT_VARIABLE NO_CONNECTION
+  )
+else()
+  execute_process(
+          COMMAND ping www.google.com -c 2
+          ERROR_QUIET
+          RESULT_VARIABLE NO_CONNECTION
+  )
+endif()
+
+if(NOT NO_CONNECTION EQUAL 0)
+  set(FETCHCONTENT_FULLY_DISCONNECTED ON)
+  message(WARNING "not fetching google test, need to have it locally to run tests")
+else()
+  set(FETCHCONTENT_FULLY_DISCONNECTED OFF)
 endif()
 
 include(FetchContent)

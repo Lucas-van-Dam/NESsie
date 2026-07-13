@@ -1,11 +1,17 @@
 add_executable(NESsieTest
     instructions/LoadStoreTransferTests.cpp
     instructions/StackTests.cpp
-    instructions/TestCpu.h
+    "TestCpu.h"
     instructions/LogicalTests.cpp
     ../cpu.cpp
-    ../memory.cpp
-)
+    ../mainbus.cpp
+    instructions/ArithmeticTests.cpp "instructions/ShiftTests.cpp" "instructions/CompareTests.cpp" "instructions/BranchTests.cpp" "instructions/JumpTests.cpp" "instructions/FlagTests.cpp" "TestMapper.h"
+        ../TestMapper.cpp
+        ../TestMapper.h
+        ../mapper.h
+        ../mapper.cpp
+        ../ppu.cpp
+        ../ppu.h)
 
 target_include_directories(NESsieTest PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -15,5 +21,7 @@ target_link_libraries(NESsieTest PRIVATE
     GTest::gtest_main
 )
 
-include(GoogleTest)
-gtest_discover_tests(NESsieTest)
+if(TARGET  NESsieTest)
+    include(GoogleTest)
+    gtest_discover_tests(NESsieTest)
+endif()
