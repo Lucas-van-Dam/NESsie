@@ -240,7 +240,7 @@ namespace NESsie {
 	public:
 		CPU();
 
-		void initialize(MainBus& mainbus, ppu* ppu);
+		void initialize();
 		void initialize(MainBus& mainbus, const std::vector<BYTE>& initialMainBus);
 
 		// returns amount of cycles ran
@@ -261,6 +261,8 @@ namespace NESsie {
 
 		// Mostly used for debugging/testing top stack value without affecting stack pointer
 		BYTE peek_byte_from_stack(MainBus& mainbus);
+
+		void NMI_handler(MainBus& mainbus);
 
 		//WORD fetch_word_from_stack(MainBus::MainBus& mainbus);
 		//void push_word_to_stack(MainBus::MainBus& mainbus, WORD value);

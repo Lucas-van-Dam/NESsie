@@ -34,7 +34,10 @@ namespace NESsie {
 
 	BYTE NROMMapper::read_chr(WORD address)
 	{
-		return 0;
+		auto size = cartridge->getCHRRom().size();
+		if (address >= size)
+			return 0;
+		return cartridge->getCHRRom()[address];
 	}
 
 	std::shared_ptr<Mapper> NESsie::create_nrom_mapper(std::unique_ptr<Cartridge> cartridge)

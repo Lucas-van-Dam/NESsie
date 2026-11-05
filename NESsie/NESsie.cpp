@@ -9,6 +9,7 @@
 #include <SDL3/SDL_main.h>
 
 #include "ppu.h"
+#include "Input.h"
 #include "VirtualScreen.h"
 
 static std::vector<BYTE> loadMainBusFromFile(const std::filesystem::path& binFile) {
@@ -48,11 +49,13 @@ int main(int argc, char **argv)
 
 	NESsie::VirtualScreen virtual_screen;
 	NESsie::MainBus mem(mapper);
-	NESsie::ppu ppu(mapper, mem);
+	NESsie::ppu ppu(mapper, mem, virtual_screen);
 	NESsie::CPU cpu;
+	NESsie::Input input;
 
 
-	cpu.initialize(mem, &ppu);
+	cpu.initialize();
+	mem.initialize(&ppu, &input);
 
 	cpu.start(mem);
 
@@ -75,8 +78,12 @@ int main(int argc, char **argv)
 		ppu.step();
 		ppu.step();
 		ppu.step();
-
+        input.step();
 		cpu.step(mem);
+
+		if (ppu.do_nmi()) {
+			cpu.NMI_handler(mem);
+		}
 	}
 
 	return 0;

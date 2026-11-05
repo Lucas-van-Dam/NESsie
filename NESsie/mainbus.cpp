@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "ppu.h"
+#include "Input.h"
 
 #include "TestMapper.h"
 
@@ -12,7 +13,7 @@ namespace NESsie {
 		mapper = create_test_mapper();
 	}
 
-	void MainBus::initialize(ppu* ppu)
+	void MainBus::initialize(ppu* ppu, Input* input)
 	{
 		static std::random_device rd; // obtain a random number from hardware
 		static std::mt19937 gen(rd()); // seed the generator
@@ -27,6 +28,7 @@ namespace NESsie {
 		}
 
 		ppu_ = ppu;
+		input_ = input;
 	}
 
 	void MainBus::initialize(const std::vector<BYTE>& initialMainBus)
@@ -38,8 +40,12 @@ namespace NESsie {
 		if (address < 0x2000)
 			return mainbus[address & 0x7FF];
 		
-		if (address < 0x4020) {
+		if (address < 0x4015) {
 			return ppu_->read_from_ppu(address);
+		}
+
+		if (address < 0x4020) {
+			return input_->read(address);
 		}
 
 		if (address < 0x6000) {
@@ -62,8 +68,13 @@ namespace NESsie {
 		}
 
 
-		if (address < 0x4020) {
+		if (address < 0x4015) {
 			ppu_->write_to_ppu(address, value);
+			return;
+		}
+
+		if (address < 0x4020) {
+			input_->write(address, value);
 			return;
 		}
 

@@ -8,7 +8,9 @@ add_executable (NESsie "NESsie.cpp" "NESsie.h" "cpu.h" "mainbus.h" "defines.h" "
         ppu.cpp
         ppu.h
         VirtualScreen.cpp
-        VirtualScreen.h)
+        VirtualScreen.h
+        Input.cpp
+        Input.h)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET NESsie PROPERTY CXX_STANDARD 20)
